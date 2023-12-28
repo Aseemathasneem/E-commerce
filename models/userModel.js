@@ -13,6 +13,10 @@ const userSchema = mongoose.Schema({
         type :String,
         required :true 
     },
+    confirm_password: {  
+        type: String,
+        required: true
+    },
     image:{
         type :String,
         required :true 
@@ -27,12 +31,24 @@ const userSchema = mongoose.Schema({
     },
     is_admin:{
         type:Number,
-        required:true
+        default: 0
+    },
+    is_blocked: {
+        type: Boolean,
+        default: false
     },
     token:{
         type:String,
         default:''
-    }
+    },
+    address:[{
+        house_name:String,
+        street:String,
+        city:String,
+        state:String,
+        postalcode:String,
+        country:String
+    }]
    
 })
 

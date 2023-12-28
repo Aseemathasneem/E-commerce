@@ -1,0 +1,246 @@
+ <html>
+  <head>
+  <!--    <link rel="stylesheet" type="text/css" href="style.css">-->
+  </head>
+  <body>
+  <style>
+   @font-face {
+        font-family: 'verdanaregular';
+        src: url(data:font/truetype;charset=utf-8;base64,)  
+  format('truetype');
+        font-weight: bold;
+        font-style: italic;
+  }    
+
+
+  body{
+        font-family: 'verdanaregular';
+        /*letter-spacing: 0.0mm !important;*/
+        /*text-align: justify;*/
+        /*font-kerning: auto;*/
+        /*line-height: 80%;*/
+    }
+
+    table{
+        width: 100%;
+    }
+
+    tr{
+        line-height: 70%;
+    }
+
+    td{
+        /*border: 1px black solid;*/
+        font-size: x-small;
+    }
+
+    #header-col-1{
+        width: 39%;
+    }
+
+    #header-col-2 {
+        width: 61%;
+    }
+
+    /*#header-col-3 {*/
+    /*    width: 44%;*/
+    /*}*/
+#logo-wrapper{
+  vertical-align: top;
+  text-align: left;
+}
+
+#logo{
+  max-width: 200px;
+  max-height: 75px;
+}
+
+#document-type-wrapper{
+  text-align: right;
+  line-height: 1.2;
+  vertical-align: top;
+}
+
+#document-type{
+  font-size: 20px;
+}
+
+#receiver-details-wrapper td{
+  vertical-align: top;
+}
+
+
+#products-table-col-1{
+  width: 52%;
+}
+
+
+
+#products-table thead tr td:nth-child(2) {
+  text-align: center;
+}
+
+
+
+#total-wrapper-col-1{
+  width: 60%;
+}
+
+
+#total-wrapper td{
+  text-align: right;
+}
+
+#bottom-notice-wrapper-col-1{
+  width: 100%;
+}
+
+#bottom-notice-wrapper tbody tr td{
+  text-align: center;
+}
+</style>
+<table id="header">
+<tr>
+  <th id="header-col-1"></th>
+  <th id="header-col-2"></th>
+</tr>
+<tr>
+  <td id="logo-wrapper">
+      %logo%
+  </td>
+  <td id="document-type-wrapper">
+      <p id="document-type">%document-title%</p><br/>
+      <b>%company-from%</b><br/>
+      %address-from%<br/>
+      %zip-from%, %city-from%<br/>
+      %country-from%<br/>
+      %sender-custom-1%<br/>
+      %sender-custom-2%<br/>
+      %sender-custom-3%
+  </td>
+</tr>
+</table>
+<br/>
+<hr/>
+<table id="receiver-details-wrapper">
+<tr>
+  <th id="receiver-details-wrapper-col-1"></th>
+  <th id="receiver-details-wrapper-col-2"></th>
+  <th id="receiver-details-wrapper-col-3"></th>
+</tr>
+<tr>
+  <td>
+      <b>%company-to%</b>
+      <br/>
+      %address-to%<br/>
+      %zip-to%, %city-to%<br/>
+      %country-to%<br/>
+      %client-custom-1%<br/>
+      %client-custom-2%<br/>
+      %client-custom-3%
+  </td>
+  <td id="details-label-wrapper">
+      <b>%number-title%:</b><br/>
+      <b>%date-title%:</b><br/>
+     
+  </td>
+  <td>
+      %number%<br/>
+      %date%<br/>
+    
+  </td>
+</tr>
+</table>
+<br/>
+<br/>
+<table id="products-table">
+<thead>
+<tr>
+  <th id="products-table-col-1"></th>
+  
+</tr>
+
+<tr>
+  <td><b>%products-header-products%</b></td>
+  <td><b>%products-header-quantity%</b></td>
+  <td><b>%products-header-price%</b></td>
+  <td><b>%products-header-total%</b></td>
+</tr>
+<tr>
+  <td colspan="4">
+      <hr/>
+  </td>
+</tr>
+</thead>
+<tbody>
+<products>
+  <tr>
+      <td>%description%</td>
+      <td align="center">%quantity%</td>
+      <td>%price%</td>
+      <td>%row-total%</td>
+  </tr>
+</products>
+</tbody>
+
+<tfoot>
+
+
+
+<tr>
+  <td colspan="4">
+      <hr/>
+  </td>
+  
+</tr>
+</tfoot>
+</table>
+
+
+
+<br/>
+<table id="total-wrapper">
+<thead>
+<tr>
+  <th id="total-wrapper-col-1"></th>
+  <th id="total-wrapper-col-2"></th>
+  <th id="total-wrapper-col-3"></th>
+</tr>
+
+</thead>
+<tbody>
+<tr>
+<td><b>subotal:</b></td>
+<td>%subtotal%</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+  <td></td>
+  <td colspan="2">
+      <hr/>
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td><b>Total:</b></td>
+  <td>%subtotal%</td>
+</tr>
+</tfoot>
+</table>
+<br/>
+<br/>
+<table id="bottom-notice-wrapper">
+<thead>
+<tr>
+  <th id="bottom-notice-wrapper-col-1"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>%bottom-notice%</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
