@@ -264,8 +264,8 @@ const loadHome = async (req, res) => {
         imageUrls: imageUrls,
         user,
         categories: allCategories,
-        banners: allBanners,
-        baseURL: 'http://localhost:3000/'
+        banners: allBanners
+        
       });
 
     } else {

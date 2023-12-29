@@ -39,7 +39,7 @@ const viewBanner = async (req, res, next) => {
         const allBanners = await Banner.find();
 
         // Render the view and pass the banners as a variable
-        res.render('bannerView', { banners: allBanners,baseURL: 'http://localhost:3000/' });
+        res.render('bannerView', { banners: allBanners });
     } catch (error) {
         next(error);
     }
