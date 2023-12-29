@@ -46,21 +46,16 @@ const loadProducts = async (req, res) => {
   }
   const loadProductsList = async (req, res) => {
     try {
-      const allProducts = await Product.find({});
-      const baseURL = req.protocol + '://' + req.get('host');
+      const products = await Product.find({});
+      
   
-      // Construct image URLs for each product
-      const productsWithImageURLs = allProducts.map(product => {
-        const firstImage = product.images.length > 0 ? product.images[0] : null;
-        const imageUrl = firstImage ? baseURL + '/productimages/' + path.basename(firstImage) : null;
-        return { ...product.toObject(), imageUrl };
-      });
-  
-      res.render('productList', { allProducts: productsWithImageURLs, baseURL });
+        res.render('productList', { products });
+      
     } catch (error) {
       console.log(error.message);
     }
   };
+  
   
   
   

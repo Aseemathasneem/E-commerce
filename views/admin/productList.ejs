@@ -309,43 +309,33 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% allProducts.forEach(product=> { %>
+                    <% if (products.length > 0) { %>
+                      <% for (let i = 0; i < products.length; i++) { %>
+                        <tr>
+                          <td><%- products[i].name %></td>
+                          <td><%- products[i].category %></td>
+                          <td><%- products[i].price %></td>
+                          <td><%- products[i].offerPrice %></td>
+                          <td><%- products[i].stock %></td>
+                  
+                          <td class="align-middle">
+                            <img style="width: 80px; height: 80px; object-fit: contain;"
+                                src="<%= products.length > 0 ? '/productimages/' + products[i].images[0].split('\\').pop() : '' %>"
+                                class="img-thumbnail" alt="Product Image" title="product" width="50">
+                        </td>
+                          <td>
+                            <a href="/admin/product-edit?id=<%= products[i]._id %>" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Edit</a>
+                            <button class="btn btn-danger delete-product-btn" data-product-id="<%= products[i]._id %>" style="padding: 6px 12px; font-size: 12px;">Delete</button>
+                          </td>
+                        </tr>
+                      <% } %>
+                    <% } else { %>
                       <tr>
-                        <td>
-                          <%= product.name %>
-                        </td>
-                        <td>
-                          <%= product.category %>
-                        </td>
-                        <td>₹<%= product.price %>
-                        </td>
-                        <td>₹<%= product.offerPrice %>
-                        </td>
-                        <td>
-                          <%= product.stock %>
-                        </td>
-                        <!-- <td>
-                          <%= product. description %>
-                        </td> -->
-                        <!-- Modify the image section to handle potential errors -->
-                        <td>
-                          <% if (product.imageUrl) { %>
-                            <img src="<%= encodeURI(product.imageUrl) %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
-                          <% } else { %>
-                            <p>No image available</p>
-                          <% } %>
-                        </td>
-                        
-                        
-                      <td>
-                        <a href="/admin/product-edit?id=<%= product._id %>" class="btn btn-primary"style="padding: 6px 12px; font-size: 12px;">Edit</a>
-                        <button class="btn btn-danger delete-product-btn" data-product-id="<%= product._id %>" style="padding: 6px 12px; font-size: 12px;">Delete</button>
-                      </td>
-
-                        
-                    </tr>
-                      <% }); %>
+                        <td colspan="6" class="text-center">No products found.</td>
+                      </tr>
+                    <% } %>
                   </tbody>
+                  
                 </table>
 
 
