@@ -1,5 +1,6 @@
 const Product = require("../models/productModel")
 const Category = require("../models/categoryModel")
+const path = require('path'); 
 const loadProducts = async (req, res) => {
     try {
       const allCategories = await Category.find({});
@@ -45,13 +46,24 @@ const loadProducts = async (req, res) => {
   }
   const loadProductsList = async (req, res) => {
     try {
-        const allProducts = await Product.find({});
-
-        res.render('productList', { allProducts, baseURL: 'http://localhost:3000/' });
+      const allProducts = await Product.find({});
+      const baseURL = req.protocol + '://' + req.get('host');
+  
+      // Construct image URLs for each product
+      const productsWithImageURLs = allProducts.map(product => {
+        const firstImage = product.images.length > 0 ? product.images[0] : null;
+        const imageUrl = firstImage ? baseURL + '/productimages/' + path.basename(firstImage) : null;
+        return { ...product.toObject(), imageUrl };
+      });
+  
+      res.render('productList', { allProducts: productsWithImageURLs, baseURL });
     } catch (error) {
-        console.log(error.message);
+      console.log(error.message);
     }
-};
+  };
+  
+  
+  
 const deleteProduct =async(req,res)=>{
   try {
      const productId=req.query.id;

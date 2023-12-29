@@ -329,17 +329,18 @@
                         </td> -->
                         <!-- Modify the image section to handle potential errors -->
                         <td>
-                          <% if (product.images && product.images.length > 0) { %>
-                              <% const imagePath = product.images[0].replace('C:\\Users\\lenovo\\Desktop\\E commerce\\public', baseURL) %>
-                              <img src="<%= encodeURI(imagePath) %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
+                          <% if (product.imageUrl) { %>
+                            <img src="<%= encodeURI(product.imageUrl) %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
                           <% } else { %>
-                              <p>No image available</p>
+                            <p>No image available</p>
                           <% } %>
-                      </td>
+                        </td>
+                        
+                        
                       <td>
                         <a href="/admin/product-edit?id=<%= product._id %>" class="btn btn-primary"style="padding: 6px 12px; font-size: 12px;">Edit</a>
                         <button class="btn btn-danger delete-product-btn" data-product-id="<%= product._id %>" style="padding: 6px 12px; font-size: 12px;">Delete</button>
-                      </td
+                      </td>
 
                         
                     </tr>
