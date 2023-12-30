@@ -12,7 +12,7 @@ const loadProducts = async (req, res) => {
   const submitProducts = async (req, res) => {
 
     try {
-     const imagePaths = req.files.map(file => file.path)
+    const imagePaths = req.files.map(file => path.basename(file.path)); // Extracting only the filenames
      const price = parseFloat(req.body.price);
      const offerPrice = parseFloat(req.body.offerPrice);
      const stock = parseInt(req.body.stock);
@@ -100,6 +100,7 @@ const editProduct = async (req, res) => {
     if (!product) {
       return res.status(404).send('Product not found');
     }
+
     // Check for invalid input values
     const price = parseFloat(req.body.price);
     const offerPrice = parseFloat(req.body.offerPrice);
@@ -119,19 +120,18 @@ const editProduct = async (req, res) => {
 
     // Handle deleted images
     const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
-   
 
     if (deletedImages.length > 0) {
       // Remove the deleted images from the product.images array
       product.images = product.images.filter(image => {
-        const filename = image.replace(/\\/g, '/').split('/').pop(); // Assuming images are stored as file paths
+        const filename = path.basename(image); // Extracting only the filename
         return !deletedImages.includes(encodeURIComponent(filename));
       });
     }
 
     if (req.files && req.files.length > 0) {
       // Extract image paths from req.files and add them to the product.images field
-      const newImages = req.files.map(file => file.path);
+      const newImages = req.files.map(file => path.basename(file.path)); // Extracting only the filenames
       product.images = [...product.images, ...newImages];
     }
 
@@ -148,7 +148,6 @@ const editProduct = async (req, res) => {
     res.status(500).send('Error editing product');
   }
 };
-
 
 
 

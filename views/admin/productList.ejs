@@ -104,10 +104,10 @@
         <ul class="menu-inner py-1">
           <!-- Dashboards -->
           <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <a href="/admin/home" class="menu-link menu-toggle">
               <i class="menu-icon tf-icons mdi mdi-home-outline"></i>
               <div data-i18n="Dashboards">Dashboards</div>
-              <div class="badge bg-danger rounded-pill ms-auto"></div>
+              
             </a>
             
           </li>
@@ -320,9 +320,10 @@
                   
                           <td class="align-middle">
                             <img style="width: 80px; height: 80px; object-fit: contain;"
-                                src="<%= products.length > 0 ? '/productimages/' + products[i].images[0].split(path.sep).pop() : '' %>"
+                                src="<%= products.length > 0 && products[i].images && products[i].images.length > 0 ? '/productimages/' + products[i].images[0].split(path.sep).pop() : '' %>"
                                 class="img-thumbnail" alt="Product Image" title="product" width="50">
                         </td>
+                        
                           <td>
                             <a href="/admin/product-edit?id=<%= products[i]._id %>" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Edit</a>
                             <button class="btn btn-danger delete-product-btn" data-product-id="<%= products[i]._id %>" style="padding: 6px 12px; font-size: 12px;">Delete</button>
