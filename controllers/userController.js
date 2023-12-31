@@ -213,31 +213,37 @@ const verifyResendOTP = async (req, res) => {
     console.log(error.message);
   }
 };
-const cropAndUploadImage = async (imagePath) => {
-  try {
-    // Check if the file exists
-    await fs.access(imagePath);
+// const cropAndUploadImage = async (imagePath) => {
+//   try {
+//     // Check if the file exists
+//     await fs.access(imagePath);
 
-    const croppedImageDir = path.join(__dirname, '../public/productimages');
-    const croppedImageName = `cropped_${path.basename(imagePath)}`;
-    const croppedImagePath = path.join(croppedImageDir, croppedImageName);
+//     console.log('Original Image Path:', imagePath);
 
-    const sharpImage = sharp(imagePath);
+//     const croppedImageDir = path.join(__dirname, '../public/productimages');
+//     console.log('Cropped Image Directory:', croppedImageDir);
 
-    const croppedImageBuffer = await sharpImage
-      .resize(300, 500)
-      .rotate()
-      .toBuffer();
+//     const croppedImageName = `cropped_${path.basename(imagePath)}`;
+//     console.log('Cropped Image Name:', croppedImageName);
 
-    await fs.promises.writeFile(croppedImagePath, croppedImageBuffer);
+//     const croppedImagePath = path.join(croppedImageDir, croppedImageName);
+//     console.log('Cropped Image Path:', croppedImagePath);
 
-    return croppedImagePath;
-  } catch (error) {
-    console.error('Error processing image:', error);
-    throw new Error('Image processing failed');
-  }
-};
+//     const sharpImage = sharp(imagePath);
 
+//     const croppedImageBuffer = await sharpImage
+//       .resize(300, 500)
+//       .rotate()
+//       .toBuffer();
+
+//     await fs.promises.writeFile(croppedImagePath, croppedImageBuffer);
+
+//     return croppedImagePath;
+//   } catch (error) {
+//     console.error('Error processing image:', error);
+//     throw new Error('Image processing failed');
+//   }
+// };
 
 
 const loadHome = async (req, res) => {
@@ -247,20 +253,9 @@ const loadHome = async (req, res) => {
     const productData = await Product.find();
 
     if (productData) {
-      const imageUrls = [];
+      // Use original image URLs directly without cropping
+      const imageUrls = productData.map(product => product.images);
 
-      for (const product of productData) {
-        try {
-          const productImageUrls = await Promise.all(product.images.map(async (imagePath) => {
-            const croppedImageUrl = await cropAndUploadImage(imagePath);
-            return croppedImageUrl;
-          }));
-
-          imageUrls.push(productImageUrls);
-        } catch (cropError) {
-          console.error('Error cropping images for a product:', cropError);
-        }
-      }
       const allBanners = await Banner.find().sort('sequence');
 
       res.render("index", {
@@ -269,17 +264,15 @@ const loadHome = async (req, res) => {
         user,
         categories: allCategories,
         banners: allBanners
-        
       });
-
     } else {
       console.log("No data found");
     }
   } catch (error) {
     console.log(error.message);
-
   }
 };
+
 
 
 
