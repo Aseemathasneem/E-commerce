@@ -320,9 +320,10 @@
                   
                           <td class="align-middle">
                             <img style="width: 80px; height: 80px; object-fit: contain;"
-                                src="<%= products.length > 0 && products[i].images && products[i].images.length > 0 ? '/productimages/' + products[i].images[0].split(path.sep).pop() : '' %>"
+                                src="<%= products.length > 0 && products[i].images && products[i].images.length > 0 ? '/productimages/' + products[i].images[0] : '' %>"
                                 class="img-thumbnail" alt="Product Image" title="product" width="50">
                         </td>
+                        
                         
                           <td>
                             <a href="/admin/product-edit?id=<%= products[i]._id %>" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Edit</a>
