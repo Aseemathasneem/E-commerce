@@ -235,11 +235,15 @@
                                 <tr>
                                     <td><strong><%= item.name %></strong></td>
                                     <td>
-                                        <% if (item.product.images && item.product.images.length > 0) { %>
+                                        <% if (item.product && item.product.images && item.product.images.length > 0) { %>
                                           <% const relativeImagePath = "/productimages/" + item.product.images[0]; %>
                                           <img src="<%= encodeURI(relativeImagePath) %>" alt="<%= item.name %> Image" class="product-image" width="50" height="50">
+                                        <% } else { %>
+                                          <!-- Handle the case when item.product or item.product.images is null or empty -->
+                                          <img src="/default-image.jpg" alt="Default Image" class="product-image" width="50" height="50">
                                         <% } %>
                                       </td>
+                                      
                                       
                                       
                                       
