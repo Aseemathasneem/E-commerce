@@ -47,9 +47,13 @@ const loadProducts = async (req, res) => {
   const loadProductsList = async (req, res) => {
     try {
       const products = await Product.find({});
-      
+      products.forEach(product => {
+        console.log('Product:', product.name);
+        console.log('Product Images:', product.images);
+    });
+
   
-        res.render('productList', {path, products });
+        res.render('productList', { products });
       
     } catch (error) {
       console.log(error.message);

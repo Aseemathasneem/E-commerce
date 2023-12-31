@@ -317,12 +317,21 @@
                           <td><%- products[i].price %></td>
                           <td><%- products[i].offerPrice %></td>
                           <td><%- products[i].stock %></td>
-                  
+                          
                           <td class="align-middle">
-                            <img style="width: 80px; height: 80px; object-fit: contain;"
-                                src="<%= products.length > 0 && products[i].images && products[i].images.length > 0 ? '/productimages/' + products[i].images[0] : '' %>"
-                                class="img-thumbnail" alt="Product Image" title="product" width="50">
-                        </td>
+                            <% if (products.length > 0 && products[i].images && products[i].images.length > 0) { %>
+                              <% const imagePath = '/productimages/' + products[i].images[0]; %>
+                              <img style="width: 80px; height: 80px; object-fit: contain;"
+                                   src="<%= encodeURI(imagePath) %>"
+                                   class="img-thumbnail" alt="Product Image" title="product" width="50">
+                            <% } else { %>
+                              <img style="width: 80px; height: 80px; object-fit: contain;"
+                                   src="/default-image.jpg"
+                                   class="img-thumbnail" alt="Default Image" title="product" width="50">
+                            <% } %>
+                          </td>
+                          
+                          
                         
                         
                           <td>

@@ -404,7 +404,7 @@ const adminOrderDetails = async (req, res, next) => {
 
             return res.status(404).send('Order not found');
         }
-        console.log('Order Details:', order);
+       
 
 
         res.render('order-details', { order });
