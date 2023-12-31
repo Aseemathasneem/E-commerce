@@ -154,7 +154,7 @@ const placeOrder = async (req, res) => {
 const loadOrderSuccess = async (req, res, next) => {
     try {
         const orderId = req.query.orderId;
-        console.log('order id', orderId)
+        
         res.render('order-success', { orderId })
     } catch (error) {
         next(error);
