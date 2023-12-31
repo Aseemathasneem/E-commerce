@@ -1,5 +1,5 @@
 const path = require("path");
-const sharp = require('sharp');
+// const sharp = require('sharp');
 const fs = require('fs').promises;
 const User = require("../models/userModel")
 const Banner = require("../models/bannerModel")
