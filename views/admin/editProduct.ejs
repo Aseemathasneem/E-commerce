@@ -420,13 +420,12 @@
                           <!-- Existing Image Previews -->
                           <% if (product.images && product.images.length > 0) { %>
                               <% product.images.forEach((image, index) => { %>
-                                  <div class="image-preview-container">
-                                    <% const imagePath = image.replace('C:\\Users\\lenovo\\Desktop\\E commerce\\public', baseURL) %>
-                                      <img src="<%= encodeURI(imagePath.replace(/\\/g, '/')) %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
-                                      <span class="delete-icon delete-image">&#10006;</span>
-
-
-                                  </div>
+                                <div class="image-preview-container">
+                                  <% const relativeImagePath = "/productimages/" + image; %>
+                                  <img src="<%= encodeURI(relativeImagePath) %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
+                                  <span class="delete-icon delete-image">&#10006;</span>
+                              </div>
+                              
                               <% }); %>
                           <% } %>
                       

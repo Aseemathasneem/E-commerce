@@ -81,7 +81,7 @@ const loadEditProduct = async(req,res)=>{
           return res.status(404).send('Product not found');
       }
       
-      res.render('editProduct', {productId,product,category: allCategories,baseURL: 'http://localhost:3000/'});
+      res.render('editProduct', {productId,product,category: allCategories});
       
   } catch (error) {
     console.log(error.message)

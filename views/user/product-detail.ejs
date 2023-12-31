@@ -186,8 +186,8 @@
                     <div class="product-card">
                         <div class="product-image-section">
                             <% if (product.images && product.images.length > 0) { %>
-                                <% const imagePath = product.images[0].replace('C:\\Users\\lenovo\\Desktop\\E commerce\\public', baseURL) %>
-                                <img class="product-image" src="<%= encodeURI(imagePath) %>" alt="<%= product.name %>">
+                                <% const relativeImagePath = "/productimages/" + product.images[0]; %>
+                                <img class="product-image" src="<%= encodeURI(relativeImagePath) %>" alt="<%= product.name %>">
                             <% } else { %>
                                 <img class="product-image" src="/default-image.jpg" alt="Default Image"> <!-- Show a default image if no product image available -->
                             <% } %>

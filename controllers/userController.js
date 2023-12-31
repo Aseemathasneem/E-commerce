@@ -213,15 +213,10 @@ const verifyResendOTP = async (req, res) => {
     console.log(error.message);
   }
 };
-
 const cropAndUploadImage = async (imagePath) => {
   try {
     // Check if the file exists
-    const exists = await fileExists(imagePath);
-
-    if (!exists) {
-      throw new Error(`Input file is missing: ${imagePath}`);
-    }
+    await fs.access(imagePath);
 
     const croppedImageDir = path.join(__dirname, '../public/productimages');
     const croppedImageName = `cropped_${path.basename(imagePath)}`;
@@ -243,15 +238,8 @@ const cropAndUploadImage = async (imagePath) => {
   }
 };
 
-// Helper function to check if a file exists
-const fileExists = async (filePath) => {
-  try {
-    await fs.access(filePath);
-    return true;
-  } catch (error) {
-    return false;
-  }
-};
+
+
 const loadHome = async (req, res) => {
   try {
     const user = req.session.user; 
