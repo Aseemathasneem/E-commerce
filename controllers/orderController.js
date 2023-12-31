@@ -354,7 +354,7 @@ const loadOrderdetails = async (req, res, next) => {
             return res.status(404).send('Order not found');
         }
 
-        res.render('orderDetails', { order, baseURL: 'http://localhost:3000/' })
+        res.render('orderDetails', { order })
     } catch (error) {
         next(error);
     }
@@ -406,7 +406,7 @@ const adminOrderDetails = async (req, res, next) => {
         }
 
 
-        res.render('order-details', { order, baseURL: 'http://localhost:3000/' });
+        res.render('order-details', { order });
     } catch (error) {
         next(error);
     }

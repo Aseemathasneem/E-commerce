@@ -236,11 +236,13 @@
                                     <td><strong><%= item.name %></strong></td>
                                     <td>
                                         <% if (item.product.images && item.product.images.length > 0) { %>
-                                            <% const imagePath = item.product.images[0].replace('C:\\Users\\lenovo\\Desktop\\E commerce\\public', baseURL) %>
-                                            <img src="<%= encodeURI(imagePath) %>" alt="<%= item.name %> Image" class="product-image" width="50" height="50">
+                                          <% const relativeImagePath = "/productimages/" + item.product.images[0]; %>
+                                          <img src="<%= encodeURI(relativeImagePath) %>" alt="<%= item.name %> Image" class="product-image" width="50" height="50">
                                         <% } %>
-                                        
-                                    </td>
+                                      </td>
+                                      
+                                      
+                                      
                                     <td><%= item.quantity %></td>
                                     <td><%= item.pricePerItem %></td>
                                     <td>
