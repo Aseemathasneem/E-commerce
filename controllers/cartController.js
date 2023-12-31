@@ -101,7 +101,7 @@ const cartLoad = async (req, res, next) => {
         });
         userCart.items.reverse();
         // Render the 'cart' view with userCart data
-        res.render('cart', { userCart, baseURL: 'http://localhost:3000/' ,req});
+        res.render('cart', { userCart,req});
     } catch (error) {
         next(error);
     }

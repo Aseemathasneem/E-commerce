@@ -213,11 +213,12 @@
                                             <td class="cart__image-wrapper cart-flex-item">
                                                 <a href="#">
                                                     <% if (item.product.images && item.product.images.length > 0) { %>
-                                                        <% const imagePath = item.product.images[0].replace('C:\\Users\\lenovo\\Desktop\\E commerce\\public', baseURL) %>
+                                                        <% const imagePath = '/productimages/' + item.product.images[0]; %>
                                                         <img class="cart__image" src="<%= encodeURI(imagePath) %>" alt="<%= item.product.name %>">
                                                     <% } else { %>
                                                         <img class="cart__image" src="/default-image.jpg" alt="Default Image">
                                                     <% } %>
+                                                    
                                                 </a>
                                             </td>
                                             <td class="cart__meta small--text-left cart-flex-item">

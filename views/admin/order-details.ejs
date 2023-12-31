@@ -296,15 +296,16 @@ th, td {
                               <% order.orderItems.forEach(item => { %>
                                   <tr>
                                       <td><strong><%= item.name %></strong></td>
-                                      <td>
+                                      <td class="align-middle">
                                         <% if (item.product && item.product.images && item.product.images.length > 0) { %>
-                                          <% const relativeImagePath = "/productimages/" + item.product.images[0]; %>
-                                          <img src="<%= encodeURI(relativeImagePath) %>" alt="<%= item.name %> Image" class="product-image" width="50" height="50">
+                                          <% const imagePath = '/productimages/' + item.product.images[0]; %>
+                                          <img src="<%= encodeURI(imagePath) %>" alt="<%= item.name %> Image" width="50" height="50">
                                         <% } else { %>
-                                          <!-- Handle the case when item.product or item.product.images is null or empty -->
-                                          <img src="/default-image.jpg" alt="Default Image" class="product-image" width="50" height="50">
+                                          <!-- Handle the case when item.product is null or item.product.images is null or empty -->
+                                          <img src="/default-image.jpg" alt="Default Image" width="50" height="50">
                                         <% } %>
                                       </td>
+                                      
                                       
                                       
                                       <td><%= item.quantity %></td>
