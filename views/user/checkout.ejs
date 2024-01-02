@@ -306,7 +306,7 @@
                                                     <label for="paymentMethodWallet">
                                                         <input type="radio" id="paymentMethodWallet" name="paymentMethod" value="Wallet" required>
                                                         Wallet
-                                                        <span id="walletBalance"> Wallet Balance: <%= userWallet.walletAmount %></span>
+                                                        <span id="walletBalance"> Wallet Balance: <%= userWallet?.walletAmount ?? 'No Wallet' %></span>
                                                     </label>
                                                 </li>
                                             </ul>
