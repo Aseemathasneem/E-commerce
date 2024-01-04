@@ -22,7 +22,7 @@ const isLogin = async (req, res, next) => {
         // If the user is not blocked or there is no user ID, proceed to the next middleware
         next();
       } else {
-        res.redirect('/home');
+        res.redirect('/login');
       }
     } catch (error) {
       console.log('Error in isLogin middleware:', error.message);
