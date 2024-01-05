@@ -430,7 +430,7 @@ const categoryFilter = async (req, res) => {
   const categoryName = req.params.categoryName;
   const PAGE_SIZE = 6; // Number of products per page
   const page = parseInt(req.query.page) || 1; // Get the requested page, default to 1
-  const sortOption = req.query.SortBy || 'title-ascending'; 
+  const sortOption = req.query.SortBy || 'title-ascending';
 
   try {
     const totalProducts = await Product.countDocuments({ category: categoryName });
@@ -443,28 +443,12 @@ const categoryFilter = async (req, res) => {
     const allCategories = await Category.find({});
 
     if (products.length > 0) {
-      const imageUrls = [];
-
-      for (const product of products) {
-        try {
-          const productImageUrls = await Promise.all(product.images.map(async (image) => {
-            const croppedImageUrl = await cropAndUploadImage(image); // Your image processing logic
-            return croppedImageUrl;
-          }));
-
-          imageUrls.push(productImageUrls);
-        } catch (cropError) {
-          console.error('Error cropping images for a product:', cropError);
-        }
-      }
-
       res.render("shop", {
         products: products,
-        imageUrls: imageUrls,
         categories: allCategories,
         totalPages: totalPages,
         currentPage: page,
-        currentCategory: categoryName ,
+        currentCategory: categoryName,
         sortOption
       });
     } else {
@@ -476,6 +460,7 @@ const categoryFilter = async (req, res) => {
     res.status(500).send('Error fetching products');
   }
 };
+
 const searchProducts = async (req, res) => {
   const searchQuery = req.query.q;
   const PAGE_SIZE = 6; // Number of products per page

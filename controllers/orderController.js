@@ -29,8 +29,15 @@ const placeOrder = async (req, res) => {
         const userId = req.session.user_id;
         const newGrandTotal = req.body.newGrandTotal;
 
-        // Fetch the user's wallet balance
-        const userWallet = await Wallet.findOne({ userId });
+        let userWallet = await Wallet.findOne({ userId });
+        if (!userWallet) {
+            userWallet = new Wallet({
+                userId,
+                walletAmount: 0,
+                transactionHistory: [],
+            });
+            await userWallet.save();
+        }
 
         // Populate the user model to access the user's address array
         const user = await User.findById(userId).populate('address');
