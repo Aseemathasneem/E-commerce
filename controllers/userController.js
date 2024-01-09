@@ -213,38 +213,6 @@ const verifyResendOTP = async (req, res) => {
     console.log(error.message);
   }
 };
-// const cropAndUploadImage = async (imagePath) => {
-//   try {
-//     // Check if the file exists
-//     await fs.access(imagePath);
-
-//     console.log('Original Image Path:', imagePath);
-
-//     const croppedImageDir = path.join(__dirname, '../public/productimages');
-//     console.log('Cropped Image Directory:', croppedImageDir);
-
-//     const croppedImageName = `cropped_${path.basename(imagePath)}`;
-//     console.log('Cropped Image Name:', croppedImageName);
-
-//     const croppedImagePath = path.join(croppedImageDir, croppedImageName);
-//     console.log('Cropped Image Path:', croppedImagePath);
-
-//     const sharpImage = sharp(imagePath);
-
-//     const croppedImageBuffer = await sharpImage
-//       .resize(300, 500)
-//       .rotate()
-//       .toBuffer();
-
-//     await fs.promises.writeFile(croppedImagePath, croppedImageBuffer);
-
-//     return croppedImagePath;
-//   } catch (error) {
-//     console.error('Error processing image:', error);
-//     throw new Error('Image processing failed');
-//   }
-// };
-
 
 const loadHome = async (req, res) => {
   try {
@@ -390,38 +358,20 @@ const sortProducts = async (req, res) => {
       .skip((page - 1) * PAGE_SIZE)
       .limit(PAGE_SIZE);
 
-    if (sortedProducts.length > 0) {
-      const imageUrls = [];
+    res.render("shop", {
+      products: sortedProducts,
+      categories: allCategories,
+      totalPages: totalPages,
+      currentPage: page,
+      sortOption
+    });
 
-      for (const product of sortedProducts) {
-        try {
-          const productImageUrls = await Promise.all(product.images.map(async (image) => {
-            const croppedImageUrl = await cropAndUploadImage(image); // Your image processing logic
-            return croppedImageUrl;
-          }));
-
-          imageUrls.push(productImageUrls);
-        } catch (cropError) {
-          console.error('Error cropping images for a product:', cropError);
-        }
-      }
-
-      res.render("shop", {
-        products: sortedProducts,
-        imageUrls: imageUrls,
-        categories: allCategories,
-        totalPages: totalPages,
-        currentPage: page,
-        sortOption
-      });
-    } else {
-      res.send('No products available');
-    }
   } catch (error) {
     console.error(error);
     res.status(500).send('Error fetching and sorting products');
   }
 };
+
 
 
 
@@ -491,40 +441,14 @@ const searchProducts = async (req, res) => {
         .limit(PAGE_SIZE);
     }
 
-    if (products.length > 0) {
-      const imageUrls = [];
+    res.render("shop", {
+      products: products,
+      categories: allCategories,
+      searchQuery: searchQuery,
+      totalPages: totalPages,
+      currentPage: page
+    });
 
-      for (const product of products) {
-        try {
-          const productImageUrls = await Promise.all(product.images.map(async (image) => {
-            const croppedImageUrl = await cropAndUploadImage(image);
-            return croppedImageUrl;
-          }));
-
-          imageUrls.push(productImageUrls);
-        } catch (cropError) {
-          console.error('Error cropping images for a product:', cropError);
-        }
-      }
-
-      res.render("shop", {
-        products: products,
-        imageUrls: imageUrls,
-        categories: allCategories,
-        searchQuery: searchQuery,
-        totalPages: totalPages,
-        currentPage: page
-      });
-    } else {
-      res.render("shop", {
-        products: [],
-        imageUrls: [],
-        categories: allCategories,
-        searchQuery: searchQuery,
-        totalPages: totalPages,
-        currentPage: page
-      });
-    }
   } catch (error) {
     console.error(error);
     res.status(500).send('Error fetching products');
