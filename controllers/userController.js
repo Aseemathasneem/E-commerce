@@ -1,5 +1,5 @@
 const path = require("path");
-// const sharp = require('sharp');
+const sharp = require('sharp');
 const fs = require('fs').promises;
 const User = require("../models/userModel")
 const Banner = require("../models/bannerModel")
@@ -221,8 +221,21 @@ const loadHome = async (req, res) => {
     const productData = await Product.find();
 
     if (productData) {
-      // Use original image URLs directly without cropping
-      const imageUrls = productData.map(product => product.images);
+      // Use cropped image URLs
+      const imageUrls = await Promise.all(productData.map(async (product) => {
+        if (product.images && product.images.length > 0) {
+          // Crop images using Sharp library
+          const imagePath = path.join(__dirname, '../public/productimages', product.images[0]);
+
+          const croppedImageUrl = await sharp(imagePath)
+            .resize({ width: 600, height: 600, fit: 'cover' }) // Adjust dimensions as needed
+            .toBuffer()
+            .then(data => `data:image/jpeg;base64,${data.toString('base64')}`);
+          return croppedImageUrl;
+        } else {
+          return null;
+        }
+      }));
 
       const allBanners = await Banner.find().sort('sequence');
 
@@ -240,7 +253,6 @@ const loadHome = async (req, res) => {
     console.log(error.message);
   }
 };
-
 
 
 

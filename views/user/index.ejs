@@ -254,18 +254,17 @@
                             <div class="container text-center">
                                 <h1>Welcome to Our Store</h1>
                                 <div class="row row-cols-1 row-cols-md-3 g-4">
-                                    <% products.forEach(product=> { %>
+                                    <% products.forEach((product,index)=> { %>
                                         <div class="col-6 col-sm-6 col-md-4 col-lg-4 item grid-view-item style2">
                                             <div class="grid-view_image">
                                                 <a href="product-accordion.html" class="grid-view-item__link">
-                                                    <% if (product.images && product.images.length> 0) { %>
-                                                        <img class="grid-view-item__image primary"
-                                                            src="<%= '/productimages/' + product.images[0].split('\\').pop() %>"
-                                                            alt="Product Image" title="product">
-                                                        <% } else { %>
-                                                            <p>No image available</p>
-                                                            <% } %>
-                                                </a>
+                                                    <% if (imageUrls[index]) { %>
+                                                      <img class="grid-view-item__image primary" src="<%= imageUrls[index] %>" alt="Product Image" title="product">
+                                                    <% } else { %>
+                                                      <p>No image available</p>
+                                                    <% } %>
+                                                  </a>
+                                                  
                                             </div>
                                             <div class="product-details text-center mobile">
                                                 <!-- product name -->
