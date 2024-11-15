@@ -1,5 +1,5 @@
 const path = require("path");
-const sharp = require('sharp');
+const Jimp = require('jimp');
 const fs = require('fs').promises;
 const User = require("../models/userModel")
 const Banner = require("../models/bannerModel")
@@ -224,13 +224,13 @@ const loadHome = async (req, res) => {
       // Use cropped image URLs
       const imageUrls = await Promise.all(productData.map(async (product) => {
         if (product.images && product.images.length > 0) {
-          // Crop images using Sharp library
+          // Crop images using Jimp
           const imagePath = path.join(__dirname, '../public/productimages', product.images[0]);
 
-          const croppedImageUrl = await sharp(imagePath)
-            .resize({ width: 600, height: 600, fit: 'cover' }) // Adjust dimensions as needed
-            .toBuffer()
-            .then(data => `data:image/jpeg;base64,${data.toString('base64')}`);
+          const croppedImage = await Jimp.read(imagePath);
+          croppedImage.resize(600, 600).cover(600, 600); // Adjust dimensions as needed
+          
+          const croppedImageUrl = await croppedImage.getBase64Async(Jimp.MIME_JPEG); // Get the base64 data URL
           return croppedImageUrl;
         } else {
           return null;
@@ -253,7 +253,6 @@ const loadHome = async (req, res) => {
     console.log(error.message);
   }
 };
-
 
 
 
