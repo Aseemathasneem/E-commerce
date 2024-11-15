@@ -27,8 +27,8 @@ app.use(noCache);
 // Use the error handler middleware (ensure it's placed after route handling middleware)
 app.use(errorHandler);
 
-// Set up the server to listen on port 3000
-const PORT = process.env.PORT || 3000; // Use the PORT from environment variables or default to 3000
+
+const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
