@@ -1,5 +1,6 @@
 const path = require("path");
 const Jimp = require('jimp');
+
 const fs = require('fs').promises;
 const User = require("../models/userModel")
 const Banner = require("../models/bannerModel")
@@ -216,41 +217,45 @@ const verifyResendOTP = async (req, res) => {
 
 const loadHome = async (req, res) => {
   try {
-    const user = req.session.user; 
-    const allCategories = await Category.find({});
-    const productData = await Product.find();
+    const user = req.session.user; // Get the logged-in user from session
+    const allCategories = await Category.find({}); // Fetch all categories
+    const productData = await Product.find(); // Fetch all products
 
     if (productData) {
-      // Use cropped image URLs
-      const imageUrls = await Promise.all(productData.map(async (product) => {
+      // Directly map the first image or set null if no images exist
+      const imageUrls = productData.map((product) => {
         if (product.images && product.images.length > 0) {
-          // Crop images using Jimp
-          const imagePath = path.join(__dirname, '../public/productimages', product.images[0]);
-
-          const croppedImage = await Jimp.read(imagePath);
-          croppedImage.resize(600, 600).cover(600, 600); // Adjust dimensions as needed
-          
-          const croppedImageUrl = await croppedImage.getBase64Async(Jimp.MIME_JPEG); // Get the base64 data URL
-          return croppedImageUrl;
+          // Use the first image from the images array
+          return `/productimages/${product.images[0]}`;
         } else {
-          return null;
+          return null; // No image available
         }
-      }));
+      });
 
+      // Fetch banners and sort by sequence
       const allBanners = await Banner.find().sort('sequence');
 
+      // Render the index page with the fetched data
       res.render("index", {
         products: productData,
-        imageUrls: imageUrls,
-        user,
-        categories: allCategories,
-        banners: allBanners
+        imageUrls: imageUrls, // Array of image paths
+        user, // User data from session
+        categories: allCategories, // List of categories
+        banners: allBanners, // Sorted banners
       });
     } else {
-      console.log("No data found");
+      console.log("No product data found.");
+      res.render("index", {
+        products: [],
+        imageUrls: [],
+        user,
+        categories: allCategories,
+        banners: [],
+      });
     }
   } catch (error) {
-    console.log(error.message);
+    console.error("Error loading home page:", error.message);
+    res.status(500).send("An error occurred while loading the page.");
   }
 };
 
