@@ -16,7 +16,7 @@ const loadWallet = async (req, res, next) => {
             await userWallet.save();
         }
 
-       // Sort transaction history in descending order based on the timestamp
+       
        userWallet.transactionHistory.sort((a, b) => b.timestamp - a.timestamp);
 
         // Render the 'wallet' view and pass the wallet data and order data (if available)
