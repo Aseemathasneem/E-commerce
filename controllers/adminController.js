@@ -407,9 +407,10 @@ const salesReportPdf = async (req, res, next) => {
       format: 'Letter',
     };
     const ejsData = ejs.render(htmlString, data);
-    
+    console.log('Rendered HTML:', ejsData);
     pdf.create(ejsData, options).toBuffer((err, buffer) => {
       if (err) {
+        console.error('PDF generation error:', err);
         next(err);
       } else {
         // Set the appropriate headers for PDF download
