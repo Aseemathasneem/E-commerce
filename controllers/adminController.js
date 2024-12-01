@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer')
 
 const excel = require('exceljs');
 const ejs = require('ejs')
-const pdf = require('html-pdf')
+const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 // const { default: orders } = require('razorpay/dist/types/orders');
@@ -366,10 +366,7 @@ const salesReportPdf = async (req, res, next) => {
   try {
     let startingDate = req.query.startingDate;
     let endingDate = req.query.endingDate;
-    
-   
 
-    // Fetch orders based on the query and sort by date in descending order
     const query = {
       status: 'Delivered',
       orderDate: {
@@ -379,12 +376,9 @@ const salesReportPdf = async (req, res, next) => {
     };
 
     const orders = await Order.find(query).sort({ orderDate: -1 });
-
-    // Calculate total sales amount and total number of orders
     let totalSalesAmount = 0;
     let totalOrders = orders.length;
 
-    // Iterate through the orders to sum up the total sales amount
     for (const order of orders) {
       totalSalesAmount += order.totalAmount;
     }
@@ -397,28 +391,19 @@ const salesReportPdf = async (req, res, next) => {
       endingDate,
     };
 
-    // const filePathName = path.resolve(__dirname, '../views/admin/reportPdf.ejs');
     const filePathName = path.join(__dirname, '..', 'views', 'admin', 'reportPdf.ejs');
-    console.log('File path:', filePathName);
-
-
     const htmlString = fs.readFileSync(filePathName).toString();
-    let options = {
-      format: 'Letter',
-    };
     const ejsData = ejs.render(htmlString, data);
-    console.log('Rendered HTML:', ejsData);
-    pdf.create(ejsData, options).toBuffer((err, buffer) => {
-      if (err) {
-        console.error('PDF generation error:', err);
-        next(err);
-      } else {
-        // Set the appropriate headers for PDF download
-        res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
-        res.setHeader('Content-Type', 'application/pdf');
-        res.status(200).end(buffer, 'binary');
-      }
-    });
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(ejsData);
+    const pdfBuffer = await page.pdf({ format: 'Letter' });
+    await browser.close();
+
+    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.status(200).end(pdfBuffer, 'binary');
   } catch (error) {
     next(error);
   }
