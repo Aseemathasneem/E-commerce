@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+     "prestart": "./update-glibc.sh",
     "start": "node index.js",
     "postinstall": "npx playwright install"
+   
   },
   "keywords": [],
   "author": "",
