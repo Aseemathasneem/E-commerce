@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer')
 
 const excel = require('exceljs');
 const ejs = require('ejs')
-const puppeteer = require('puppeteer');
+const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 // const { default: orders } = require('razorpay/dist/types/orders');
@@ -395,12 +395,16 @@ const salesReportPdf = async (req, res, next) => {
     const htmlString = fs.readFileSync(filePathName).toString();
     const ejsData = ejs.render(htmlString, data);
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.setContent(ejsData);
-    const pdfBuffer = await page.pdf({ format: 'Letter' });
-    await browser.close();
+    // Use Playwright to generate PDF
+    const browser = await chromium.launch(); // Launch Chromium
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
+    await page.setContent(ejsData, { waitUntil: 'load' }); // Load the rendered HTML content
+    const pdfBuffer = await page.pdf({ format: 'Letter' }); // Generate PDF
+    await browser.close(); // Close the browser
+
+    // Send the PDF as response
     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.status(200).end(pdfBuffer, 'binary');
