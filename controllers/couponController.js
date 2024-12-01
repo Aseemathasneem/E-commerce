@@ -46,6 +46,28 @@ const addCoupon = async (req, res) => {
     }
 };
 
+const getValidCouponsForUser = async (userId, userCartTotal) => {
+    try {
+      // Fetch all coupons from the database
+      const allCoupons = await Coupon.find({});
+  
+      // Validate each coupon for the user
+      const validCoupons = [];
+      for (const coupon of allCoupons) {
+        const validationResult = await validateCoupon(coupon.couponCode, userCartTotal, userId);
+        if (validationResult.isValid) {
+          validCoupons.push(validationResult.coupon);
+        }
+      }
+  
+      return validCoupons;
+    } catch (error) {
+      console.error("Error fetching valid coupons:", error);
+      return [];
+    }
+  };
+  
+
 const applyCoupon = async (req, res, next) => {
     try {
         const couponCode = req.body.coupon;
@@ -204,4 +226,7 @@ module.exports={loadAddCoupon,
     viewCoupon,
     deleteCoupon,
     loadEditCoupon,
-    EditCoupon }
+    EditCoupon ,
+    getValidCouponsForUser
+
+}

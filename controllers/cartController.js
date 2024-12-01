@@ -3,6 +3,7 @@ const User = require("../models/userModel")
 const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
 const Wallet = require('../models/walletModel');
+const { getValidCouponsForUser } = require("./couponController");
 
 
 const addToCart = async (req, res, next) => {
@@ -91,21 +92,35 @@ const removeItem = async (req, res, next) => {
 
 const cartLoad = async (req, res, next) => {
     try {
-        // Assuming you have the user's ID in the session
-        const userId = req.session.user_id;
-
-        // Fetch the user's cart data
-        const userCart = await Cart.findOne({ user: userId }).populate({
-            path: 'items.product',
-            model: 'Product'
-        });
-        userCart.items.reverse();
-        // Render the 'cart' view with userCart data
-        res.render('cart', { userCart,req});
+      // Assuming you have the user's ID in the session
+      const userId = req.session.user_id;
+  
+      // Fetch the user's cart data
+      const userCart = await Cart.findOne({ user: userId }).populate({
+        path: 'items.product',
+        model: 'Product'
+      });
+  
+      if (!userCart) {
+        return res.render('cart', { userCart: null, validCoupons: [], req });
+      }
+  
+      userCart.items.reverse();
+  
+      // Calculate total cart value
+      const userCartTotal = userCart.items.reduce((total, item) => {
+        return total + item.product.price * item.quantity;
+      }, 0);
+  
+      // Fetch valid coupons for the user
+      const validCoupons = await getValidCouponsForUser(userId, userCartTotal);
+  
+      // Render the 'cart' view with userCart and validCoupons data
+      res.render('cart', { userCart, validCoupons, req });
     } catch (error) {
-        next(error);
+      next(error);
     }
-};
+  };
 const updateQuantity = async (req, res, next) => {
     try {
         const userId = req.session.user_id; // Assuming you have user sessions set up

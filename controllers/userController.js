@@ -258,6 +258,69 @@ const loadHome = async (req, res) => {
     res.status(500).send("An error occurred while loading the page.");
   }
 };
+const getShopProducts = async (req, res) => {
+  const PAGE_SIZE = 6; // Number of products per page
+  const page = parseInt(req.query.page) || 1; // Current page
+  const searchQuery = req.query.q || ""; // Search keyword
+  const categoryName = req.query.category || ""; // Category filter
+  const sortOption = req.query.SortBy || "title-ascending"; // Sorting option
+
+  try {
+    const allCategories = await Category.find({});
+    let query = {};
+    let message = ""; // Initialize message variable
+
+    // Apply category filter
+    if (categoryName) {
+      query.category = categoryName;
+    }
+
+    // Validate search query length
+    if (searchQuery && searchQuery.length < 2) {
+      message = "Please enter at least 2 characters for the search.";
+    } else if (searchQuery) {
+      query.$or = [
+        { name: { $regex: searchQuery, $options: "i" } },
+        { description: { $regex: searchQuery, $options: "i" } },
+      ];
+    }
+
+    // Determine sort criteria
+    const sortCriteria = {};
+    if (sortOption === "price-ascending") {
+      sortCriteria.price = 1; // Ascending order
+    } else if (sortOption === "price-descending") {
+      sortCriteria.price = -1; // Descending order
+    }
+
+    // Count total products for pagination
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / PAGE_SIZE);
+
+    // Fetch products based on filters, search, and sorting
+    const products = await Product.find(query)
+      .sort(sortCriteria)
+      .skip((page - 1) * PAGE_SIZE)
+      .limit(PAGE_SIZE);
+
+    // Render the results
+    res.render("shop", {
+      products: products,
+      categories: allCategories,
+      totalPages: totalPages,
+      currentPage: page,
+      searchQuery: searchQuery,
+      currentCategory: categoryName,
+      sortOption: sortOption,
+      message: message, // Pass message to the template
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching products");
+  }
+};
+
+
 
 
 
@@ -350,126 +413,11 @@ const loadShop = async (req, res) => {
     console.log(error.message);
   }
 };
-const sortProducts = async (req, res) => {
-  try {
-    const sortOption = req.query.SortBy || 'title-ascending'; // Default to some default sorting option if not provided
-
-    // Fetch total number of products
-    const totalProducts = await Product.countDocuments();
-    const allCategories = await Category.find({});
-    const PAGE_SIZE = 6; // Number of products per page
-    const page = parseInt(req.query.page) || 1; // Get the requested page, default to 1
-    const totalPages = Math.ceil(totalProducts / PAGE_SIZE);
-
-    const sortCriteria = {};
-    if (sortOption === 'price-ascending') {
-      sortCriteria.price = 1; // Sort by price in ascending order
-    } else if (sortOption === 'price-descending') {
-      sortCriteria.price = -1; // Sort by price in descending order
-    }
-
-    // Fetch and render sorted products
-    const sortedProducts = await Product.find()
-      .sort(sortCriteria)
-      .skip((page - 1) * PAGE_SIZE)
-      .limit(PAGE_SIZE);
-
-    res.render("shop", {
-      products: sortedProducts,
-      categories: allCategories,
-      totalPages: totalPages,
-      currentPage: page,
-      sortOption
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching and sorting products');
-  }
-};
 
 
 
 
 
-const categoryFilter = async (req, res) => {
-  const categoryName = req.params.categoryName;
-  const PAGE_SIZE = 6; // Number of products per page
-  const page = parseInt(req.query.page) || 1; // Get the requested page, default to 1
-  const sortOption = req.query.SortBy || 'title-ascending';
-
-  try {
-    const totalProducts = await Product.countDocuments({ category: categoryName });
-    const totalPages = Math.ceil(totalProducts / PAGE_SIZE);
-
-    const products = await Product.find({ category: categoryName })
-      .skip((page - 1) * PAGE_SIZE)
-      .limit(PAGE_SIZE);
-
-    const allCategories = await Category.find({});
-
-    if (products.length > 0) {
-      res.render("shop", {
-        products: products,
-        categories: allCategories,
-        totalPages: totalPages,
-        currentPage: page,
-        currentCategory: categoryName,
-        sortOption
-      });
-    } else {
-      res.send('No products in this category');
-    }
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching products');
-  }
-};
-
-const searchProducts = async (req, res) => {
-  const searchQuery = req.query.q;
-  const PAGE_SIZE = 6; // Number of products per page
-  const page = parseInt(req.query.page) || 1; // Get the requested page, default to 1
-
-  try {
-    let query = {};
-    const allCategories = await Category.find({});
-    let products;
-
-    if (searchQuery) {
-      query.$or = [
-        { name: { $regex: searchQuery, $options: 'i' } },
-        { description: { $regex: searchQuery, $options: 'i' } }
-      ];
-    }
-
-    const totalProducts = await Product.countDocuments(query);
-    const totalPages = Math.ceil(totalProducts / PAGE_SIZE);
-
-    if (searchQuery) {
-      products = await Product.find(query)
-        .skip((page - 1) * PAGE_SIZE)
-        .limit(PAGE_SIZE);
-    } else {
-      products = await Product.find({})
-        .skip((page - 1) * PAGE_SIZE)
-        .limit(PAGE_SIZE);
-    }
-
-    res.render("shop", {
-      products: products,
-      categories: allCategories,
-      searchQuery: searchQuery,
-      totalPages: totalPages,
-      currentPage: page
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching products');
-  }
-};
 
 const loadProductDetail = async (req, res) => {
     try {
@@ -663,9 +611,7 @@ module.exports = {
   verifyResendOTP,
   verifyOtp,
   loadShop,
-  categoryFilter,
-  searchProducts,
-  sortProducts,
+  getShopProducts,
   loadProductDetail,
   loadProfile,
   submitProfile,

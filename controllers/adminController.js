@@ -397,7 +397,9 @@ const salesReportPdf = async (req, res, next) => {
       endingDate,
     };
 
-    const filePathName = path.resolve(__dirname, '../views/admin/reportPdf.ejs');
+    // const filePathName = path.resolve(__dirname, '../views/admin/reportPdf.ejs');
+    const filePathName = path.join(__dirname, '..', 'views', 'admin', 'reportPdf.ejs');
+
     const htmlString = fs.readFileSync(filePathName).toString();
     let options = {
       format: 'Letter',

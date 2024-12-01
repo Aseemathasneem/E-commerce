@@ -17,6 +17,7 @@
 <!-- Main Style CSS -->
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="assets/css/responsive.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <style>
     table {
@@ -216,8 +217,8 @@
             
                             <!-- "Cancel Order" button (if the order is not cancelled) -->
                             <% if (order.status !== 'Cancelled' && order.status !== 'Delivered') { %>
-                                <form method="POST" action="/cancel-order/<%= order._id %>" style="display: inline-block;">
-                                    <button class="btn btn--secondary" type="submit">Cancel Order</button>
+                                <form method="POST" action="/cancel-order/<%= order._id %>" style="display: inline-block;" class="cancel-order-form">
+                                    <button class="btn btn--secondary cancel-order-btn" type="button" data-order-id="<%= order._id %>">Cancel Order</button>
                                 </form>
                             <% } %>
                         </div>
@@ -355,6 +356,32 @@ const errorMessage = getQueryParam('errorMessage');
 if (errorMessage) {
     alert(decodeURIComponent(errorMessage)); // Display the error message as an alert
 }
+
+
+ // Attach event listener to Cancel Order buttons
+ document.addEventListener('DOMContentLoaded', () => {
+        const cancelButtons = document.querySelectorAll('.cancel-order-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const orderId = this.getAttribute('data-order-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to cancel this order? This action cannot be undone.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit the form if confirmed
+                        this.closest('form').submit();
+                    }
+                });
+            });
+        });
+    });
 
     </script> 
 </div>

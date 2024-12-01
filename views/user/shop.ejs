@@ -25,13 +25,21 @@
         <!--Search Form Drawer-->
         <div class="search">
             <div class="search__form">
-                <form class="search-bar__form" action="/search">
+                <form class="search-bar__form" action="/shop" method="get">
+                    <input type="hidden" name="category" value="<%= currentCategory %>">
+                    <input type="hidden" name="SortBy" value="<%= sortOption %>">
+                    <input type="hidden" name="page" value="<%= currentPage %>">
                     <label for="searchInput" class="visually-hidden">Search entire store</label>
-                    <input id="searchInput" class="search__input" type="search" name="q" value="" placeholder="Search entire store..." aria-label="Search" autocomplete="off">
+                    <input id="searchInput" class="search__input" type="search" name="q" value="<%= searchQuery %>" placeholder="Search entire store..." aria-label="Search" autocomplete="off">
                     <button class="go-btn search__button" type="submit" title="Search">
-                        <i class="icon anm anm-search-l" alt="Search icon"></i>
+                      <i class="icon anm anm-search-l" alt="Search icon"></i>
                     </button>
-                </form>
+                  </form>
+                  <% if (message) { %>
+                    <div class="search-warning" style="color: red; margin-top: 5px;">
+                      <%= message %>
+                    </div>
+                  <% } %>
                 
                 <button type="button" class="search-trigger close-btn"><i class="icon anm anm-times-l"></i></button>
             </div>
@@ -98,7 +106,7 @@
                                             class="anm anm-angle-down-l"></i></a>
 
                                 </li>
-                                <li class="lvl1 parent megamenu"><a href="#">Shop <i
+                                <li class="lvl1 parent megamenu"><a href="/shop">Shop <i
                                             class="anm anm-angle-down-l"></i></a>
 
                                 </li>
@@ -209,14 +217,14 @@
                                 <div class="widget-content">
                                     <!-- Your existing HTML structure -->
                                     <ul class="sidebar_categories">
-                                        <% categories.forEach(category=> { %>
-                                            <li class="lvl-1">
-                                                <a href="/shop/<%= category.categoryName %>" class="site-nav">
-                                                    <%= category.categoryName %>
-                                                </a>
-                                            </li>
+                                        <% categories.forEach(category => { %>
+                                          <li class="lvl-1">
+                                            <a href="/shop?category=<%= encodeURIComponent(category.categoryName) %>&q=<%= searchQuery %>&SortBy=<%= sortOption %>&page=<%= currentPage %>" class="site-nav">
+                                              <%= category.categoryName %>
+                                            </a>
+                                          </li>
                                         <% }) %>
-                                    </ul>
+                                      </ul>
 
                                 </div>
                             </div>
@@ -275,13 +283,15 @@
                                         
                                         <div class="col-4 col-md-4 col-lg-4 text-right">
                                             <div class="filters-toolbar__item">
-                                                <form action="/sort" method="get">
-                                                    <!-- Other form fields for category filtering, if needed -->
+                                                <form action="/shop" method="get">
+                                                    <input type="hidden" name="category" value="<%= currentCategory %>">
+                                                    <input type="hidden" name="q" value="<%= searchQuery %>">
+                                                    <input type="hidden" name="page" value="<%= currentPage %>">
                                                     <label for="SortBy" class="hidden">Sort</label>
-                                                    <select name="SortBy" id="SortBy" class="filters-toolbar__input filters-toolbar__input--sort"style="width: 150px;">
-                                                      <option value="title-ascending" selected="selected">Sort</option>
-                                                      <option value="price-ascending">Price, Low to high</option>
-                                                      <option value="price-descending">Price, High to low</option>
+                                                    <select name="SortBy" id="SortBy" class="filters-toolbar__input filters-toolbar__input--sort" style="width: 150px;">
+                                                      <option value="title-ascending" <%= sortOption === "title-ascending" ? "selected" : "" %>>Sort</option>
+                                                      <option value="price-ascending" <%= sortOption === "price-ascending" ? "selected" : "" %>>Price, Low to high</option>
+                                                      <option value="price-descending" <%= sortOption === "price-descending" ? "selected" : "" %>>Price, High to low</option>
                                                     </select>
                                                     <button type="submit">Apply</button>
                                                   </form>
@@ -361,15 +371,15 @@
                                 </div>
                                 <div class="pagination">
                                     <ul>
-                                      <% if (totalPages > 1) { %>
-                                        <% for (let i = 1; i <= totalPages; i++) { %>
-                                          <li class="<%= i === currentPage ? 'active' : '' %>">
-                                            <a href="?page=<%= i %>&SortBy=<%= sortOption %>"><%= i %></a>
-                                          </li>
+                                        <% if (totalPages > 1) { %>
+                                          <% for (let i = 1; i <= totalPages; i++) { %>
+                                            <li class="<%= i === currentPage ? 'active' : '' %>">
+                                              <a href="/shop?category=<%= currentCategory %>&q=<%= searchQuery %>&SortBy=<%= sortOption %>&page=<%= i %>"><%= i %></a>
+                                            </li>
+                                          <% } %>
                                         <% } %>
-                                      <% } %>
-                                    </ul>
-                                  </div>
+                                      </ul>
+                                </div>
 
 
                             </div>

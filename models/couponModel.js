@@ -29,7 +29,7 @@ const couponSchema = new mongoose.Schema({
     },
     usedCount: {
         type: Number,
-        default: 0 ,// Initialize usedCount with 0
+        default: 0 ,
     },
     usersApplied: [{
         type: mongoose.Schema.Types.ObjectId,

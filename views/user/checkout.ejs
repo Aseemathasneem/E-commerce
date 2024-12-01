@@ -269,20 +269,20 @@
                                     <form action="/placeOrder" method="post" id="placeOrderForm">
                                         <div class="row">
                                             <!-- Assuming user.address is an array of addresses from your database -->
-                                            <% user.address.forEach((address, index)=> { %>
+                                            <% user.address.forEach((address, index) => { %>
                                                 <div class="form-check col-12">
                                                     <input type="radio" class="form-check-input" name="selectedAddress"
-                                                        value="<%= index %>" id="address<%= index %>" required>
+                                                        value="<%= index %>" id="address<%= index %>" 
+                                                        <% if (index === 0) { %>checked<% } %> required>
                                                     <label class="form-check-label" for="address<%= index %>"
                                                         style="white-space: pre-line;">
                                                         <!-- Display address details with line breaks using inline style -->
                                                         <h6 style="display: inline;">Address <%= index + 1 %>:</h6>
                                                         <%= `${address.house_name}, ${address.street},\n${address.city},
-                                                            ${address.state},\n${address.postalcode},
-                                                            ${address.country}` %>
+                                                            ${address.state},\n${address.postalcode}, ${address.country}` %>
                                                     </label>
                                                 </div>
-                                                <% }); %>
+                                            <% }); %>
                                         </div>
 
                                         <!-- Payment Method Section -->

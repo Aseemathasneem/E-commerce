@@ -69,11 +69,9 @@ user_route.get('/login',noCache, auth.isLogout, userController.loginLoad);
 user_route.post('/login',noCache,auth.isLogout, userController.verifyLogin);
 user_route.get('/logout',noCache,auth.isLogin, userController.userLogout);
 
-user_route.get('/shop',auth.isLogin,userController.loadShop)
-user_route.get('/shop/:categoryName',auth.isLogin,userController.categoryFilter)
-user_route.get('/search',auth.isLogin,userController.searchProducts)
-user_route.get('/product-detail/:productId',auth.isLogin,userController.loadProductDetail)
-user_route.get('/sort',auth.isLogin,userController.sortProducts)
+user_route.get('/shop',userController.getShopProducts)
+// user_route.get('/shopProducts', userController.getShopProducts);
+user_route.get('/product-detail/:productId',userController.loadProductDetail)
 user_route.get('/cart',auth.isLogin, cartController.cartLoad);
 user_route.post('/cart/:productId',auth.isLogin, cartController.addToCart);
 user_route.post('/updateQuantity', auth.isLogin, cartController.updateQuantity);

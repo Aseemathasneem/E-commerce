@@ -208,9 +208,23 @@
                 <div class="row">
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 main-col">
                         <div class="alert alert-success text-uppercase" role="alert">
-                            <i class="icon anm anm-truck-l icon-large"></i> &nbsp;<strong>Congratulations!</strong>
-                            You've got free shipping!
-                        </div>
+                            <i class="icon anm anm-tag-l icon-large"></i> &nbsp;
+                            <strong>Available Coupons:</strong>
+                            <ul class="coupon-list" style="margin-top: 10px; list-style-type: none; padding-left: 0;">
+                              <% if (validCoupons && validCoupons.length > 0) { %>
+                                <% validCoupons.forEach(coupon => { %>
+                                  <li style="margin-bottom: 5px;">
+                                    <strong>Code:</strong> <%= coupon.couponCode %> | 
+                                    <strong>Discount:</strong> <%= coupon. discountPercentage %>% | 
+                                    <strong>Expires At:</strong> <%= coupon.endDate.toLocaleDateString() %>
+                                  </li>
+                                <% }) %>
+                              <% } else { %>
+                                <li>No coupons available for your cart.</li>
+                              <% } %>
+                            </ul>
+                          </div>
+                          
                         <form action="#" method="post" class="cart style2">
                             <table>
                                 <thead class="cart__row cart__header">
