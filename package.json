@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "npx playwright install-deps && npx playwright install",
+    
     "start": "node index.js"
   },
   "keywords": [],
