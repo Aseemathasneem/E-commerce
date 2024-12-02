@@ -395,7 +395,7 @@ const salesReportPdf = async (req, res, next) => {
     const ejsData = ejs.render(htmlString, data);
 
     const browser = await puppeteer.launch({
-      executablePath: '/usr/bin/chromium', 
+      
       args: ['--no-sandbox', '--disable-setuid-sandbox'], 
   });
     const page = await browser.newPage();
