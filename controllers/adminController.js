@@ -402,35 +402,45 @@ const salesReportPdf = async (req, res, next) => {
     // Header
     doc.fontSize(20).text('Sales Report', { align: 'center' });
     doc.moveDown();
-    doc.fontSize(12)
+    doc
+      .fontSize(12)
       .text(`Date Range: ${startingDate} - ${endingDate}`)
       .text(`Total Sales Amount: ₹ ${totalSalesAmount.toFixed(2)}`)
       .text(`Total Orders: ${totalOrders}`);
     doc.moveDown();
 
     // Table Header
-    doc.fontSize(10);
     const tableTop = doc.y;
     const cellWidth = 100;
-    const cellHeight = 20;
+    const minRowHeight = 20;
 
-    doc.text('Order ID', 50, tableTop, { width: cellWidth, align: 'left' });
+    doc.fontSize(10).text('Order ID', 50, tableTop, { width: cellWidth, align: 'left' });
     doc.text('Order Date', 150, tableTop, { width: cellWidth, align: 'left' });
     doc.text('Product', 250, tableTop, { width: cellWidth, align: 'left' });
     doc.text('Quantity', 350, tableTop, { width: cellWidth, align: 'left' });
     doc.text('Total Amount', 450, tableTop, { width: cellWidth, align: 'left' });
-    doc.moveDown(0.5);
 
-    doc.rect(50, tableTop - 5, 500, 1).fillColor('#000').fill(); // Table header underline
-    doc.fillColor('#000'); // Reset color
+    // Table Header Border
+    doc.rect(50, tableTop - 5, 500, minRowHeight).stroke();
 
     // Table Body
-    let yPosition = tableTop + cellHeight;
+    let yPosition = tableTop + minRowHeight;
 
     orders.forEach((order) => {
       const productNames = order.orderItems.map((item) => item.name).join(', ');
       const productQuantities = order.orderItems.map((item) => item.quantity).join(', ');
 
+      // Calculate dynamic row height
+      const textHeight = Math.max(
+        doc.heightOfString(productNames, { width: cellWidth }),
+        doc.heightOfString(productQuantities, { width: cellWidth })
+      );
+      const rowHeight = Math.max(minRowHeight, textHeight + 10);
+
+      // Draw a border for each row
+      doc.rect(50, yPosition - 5, 500, rowHeight).stroke();
+
+      // Add the table data
       doc.text(order.orderID, 50, yPosition, { width: cellWidth, align: 'left' });
       doc.text(new Date(order.orderDate).toLocaleDateString(), 150, yPosition, {
         width: cellWidth,
@@ -440,7 +450,7 @@ const salesReportPdf = async (req, res, next) => {
       doc.text(productQuantities, 350, yPosition, { width: cellWidth, align: 'left' });
       doc.text(order.totalAmount.toFixed(2), 450, yPosition, { width: cellWidth, align: 'left' });
 
-      yPosition += cellHeight;
+      yPosition += rowHeight;
 
       // Add a new page if the table exceeds the page height
       if (yPosition > 750) {
