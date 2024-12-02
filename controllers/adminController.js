@@ -392,81 +392,67 @@ const salesReportPdf = async (req, res, next) => {
     };
 
     // Create a new PDF document
-    const doc = new PDFDocument({ margin: 30 });
+    const doc = new PDFDocument();
     const filePath = `./sales-report-${Date.now()}.pdf`;
 
     // Pipe PDF content to a file
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    // Report Header
-    doc.fontSize(18).text('Sales Report', { align: 'center' }).moveDown();
-
-    doc
-      .fontSize(12)
-      .text(`Start Date: ${startingDate}`)
-      .text(`End Date: ${endingDate}`)
-      .text(`Total Orders: ${totalOrders}`)
-      .text(`Total Sales Amount: ₹${totalSalesAmount.toFixed(2)}`)
-      .moveDown();
+    // Header
+    doc.fontSize(20).text('Sales Report', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12)
+      .text(`Date Range: ${startingDate} - ${endingDate}`)
+      .text(`Total Sales Amount: ₹ ${totalSalesAmount.toFixed(2)}`)
+      .text(`Total Orders: ${totalOrders}`);
+    doc.moveDown();
 
     // Table Header
-    doc.fontSize(14).text('Order Details:', { underline: true }).moveDown();
+    doc.fontSize(10);
     const tableTop = doc.y;
-    const colWidths = [100, 100, 200, 80, 80];
-    const headers = ['Order ID', 'Order Date', 'Products', 'Quantity', 'Total Amount'];
+    const cellWidth = 100;
+    const cellHeight = 20;
 
-    headers.forEach((header, index) => {
-      doc
-        .fontSize(12)
-        .text(header, 50 + colWidths.slice(0, index).reduce((a, b) => a + b, 0), tableTop, {
-          width: colWidths[index],
-          align: 'center',
-        });
-    });
+    doc.text('Order ID', 50, tableTop, { width: cellWidth, align: 'left' });
+    doc.text('Order Date', 150, tableTop, { width: cellWidth, align: 'left' });
+    doc.text('Product', 250, tableTop, { width: cellWidth, align: 'left' });
+    doc.text('Quantity', 350, tableTop, { width: cellWidth, align: 'left' });
+    doc.text('Total Amount', 450, tableTop, { width: cellWidth, align: 'left' });
+    doc.moveDown(0.5);
 
-    // Draw Line Under Header
-    doc
-      .moveTo(50, tableTop + 20)
-      .lineTo(50 + colWidths.reduce((a, b) => a + b, 0), tableTop + 20)
-      .stroke();
+    doc.rect(50, tableTop - 5, 500, 1).fillColor('#000').fill(); // Table header underline
+    doc.fillColor('#000'); // Reset color
 
-    // Table Rows
-    let y = tableTop + 25;
+    // Table Body
+    let yPosition = tableTop + cellHeight;
+
     orders.forEach((order) => {
       const productNames = order.orderItems.map((item) => item.name).join(', ');
-      const quantities = order.orderItems.map((item) => item.quantity).join(', ');
+      const productQuantities = order.orderItems.map((item) => item.quantity).join(', ');
 
-      const row = [
-        order._id,
-        new Date(order.orderDate).toLocaleDateString(),
-        productNames,
-        quantities,
-        `₹${order.totalAmount.toFixed(2)}`,
-      ];
-
-      row.forEach((cell, index) => {
-        doc
-          .fontSize(10)
-          .text(cell, 50 + colWidths.slice(0, index).reduce((a, b) => a + b, 0), y, {
-            width: colWidths[index],
-            align: 'center',
-          });
+      doc.text(order.orderID, 50, yPosition, { width: cellWidth, align: 'left' });
+      doc.text(new Date(order.orderDate).toLocaleDateString(), 150, yPosition, {
+        width: cellWidth,
+        align: 'left',
       });
+      doc.text(productNames, 250, yPosition, { width: cellWidth, align: 'left' });
+      doc.text(productQuantities, 350, yPosition, { width: cellWidth, align: 'left' });
+      doc.text(order.totalAmount.toFixed(2), 450, yPosition, { width: cellWidth, align: 'left' });
 
-      y += 20;
+      yPosition += cellHeight;
 
-      // Add a new page if the current one is full
-      if (y > doc.page.height - 50) {
+      // Add a new page if the table exceeds the page height
+      if (yPosition > 750) {
         doc.addPage();
-        y = 50;
+        yPosition = 50;
       }
     });
 
     // Finalize PDF
     doc.end();
 
-    // When writing is complete, send the file
+    // Send PDF to client
     writeStream.on('finish', () => {
       res.download(filePath, 'sales-report.pdf', (err) => {
         if (err) {
