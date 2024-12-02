@@ -4,10 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "npx playwright install --with-deps",
+    "prestart": "npx playwright install-deps && npx playwright install",
     "start": "node index.js"
-   
-   
   },
   "keywords": [],
   "author": "",
@@ -30,6 +28,7 @@
     "nodemailer": "^6.9.6",
     "nodemon": "^3.0.1",
     "otp-generator": "^4.0.1",
+    "pdfkit": "^0.15.1",
     "playwright": "^1.49.0",
     "puppeteer": "^23.9.0",
     "puppeteer-core": "^23.9.0",

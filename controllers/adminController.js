@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer')
 
 const excel = require('exceljs');
 const ejs = require('ejs')
-const { chromium } = require('playwright');
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 // const { default: orders } = require('razorpay/dist/types/orders');
@@ -364,8 +364,8 @@ const generateReport = async (req, res, next) => {
 
 const salesReportPdf = async (req, res, next) => {
   try {
-    let startingDate = req.query.startingDate;
-    let endingDate = req.query.endingDate;
+    const startingDate = req.query.startingDate;
+    const endingDate = req.query.endingDate;
 
     const query = {
       status: 'Delivered',
@@ -391,23 +391,49 @@ const salesReportPdf = async (req, res, next) => {
       endingDate,
     };
 
-    const filePathName = path.join(__dirname, '..', 'views', 'admin', 'reportPdf.ejs');
-    const htmlString = fs.readFileSync(filePathName).toString();
-    const ejsData = ejs.render(htmlString, data);
+    // Create a new PDF document
+    const doc = new PDFDocument();
+    const filePath = `./sales-report-${Date.now()}.pdf`;
 
-    // Use Playwright to generate PDF
-    const browser = await chromium.launch(); // Launch Chromium
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    // Pipe PDF content to a file
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
 
-    await page.setContent(ejsData, { waitUntil: 'load' }); // Load the rendered HTML content
-    const pdfBuffer = await page.pdf({ format: 'Letter' }); // Generate PDF
-    await browser.close(); // Close the browser
+    // Add content to the PDF
+    doc.fontSize(16).text('Sales Report', { align: 'center' });
+    doc.moveDown();
 
-    // Send the PDF as response
-    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
-    res.setHeader('Content-Type', 'application/pdf');
-    res.status(200).end(pdfBuffer, 'binary');
+    doc.fontSize(12).text(`Start Date: ${startingDate}`);
+    doc.text(`End Date: ${endingDate}`);
+    doc.text(`Total Orders: ${totalOrders}`);
+    doc.text(`Total Sales Amount: ${totalSalesAmount.toFixed(2)}`);
+    doc.moveDown();
+
+    doc.fontSize(14).text('Order Details:');
+    doc.moveDown();
+
+    orders.forEach((order, index) => {
+      doc.fontSize(12).text(
+        `Order ${index + 1}: Date: ${order.orderDate}, Amount: ${order.totalAmount.toFixed(
+          2
+        )}, Status: ${order.status}`
+      );
+      doc.moveDown();
+    });
+
+    doc.end();
+
+    // When writing is complete, send the file
+    writeStream.on('finish', () => {
+      res.download(filePath, 'sales-report.pdf', (err) => {
+        if (err) {
+          console.error(err);
+        }
+
+        // Clean up the file after download
+        fs.unlinkSync(filePath);
+      });
+    });
   } catch (error) {
     next(error);
   }
