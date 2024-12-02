@@ -79,6 +79,15 @@ admin_route.get('/userOrders',auth.isLogin,adminController.userOrders)
 admin_route.get('/sales-report',auth.isLogin,adminController.loadReportForm);
 admin_route.post('/generate-report',auth.isLogin,adminController.generateReport);
 admin_route.get('/sales-report-pdf',auth.isLogin,adminController.salesReportPdf);
+// Daily sales report route
+admin_route.get('/sales-report-pdf/daily', auth.isLogin, adminController.salesReportDaily);
+
+// Weekly sales report route
+admin_route.get('/sales-report-pdf/weekly', auth.isLogin, adminController.salesReportWeekly);
+
+// Monthly sales report route
+admin_route.get('/sales-report-pdf/monthly', auth.isLogin, adminController.salesReportMonthly);
+
 admin_route.get('/sales-report-excel',auth.isLogin,adminController.salesReportExcel);
 
 

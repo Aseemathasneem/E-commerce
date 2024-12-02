@@ -545,6 +545,194 @@ const salesReportExcel = async (req, res, next) => {
   }
 };
 
+const getDateRange = (type) => {
+  const currentDate = new Date();
+  let startingDate, endingDate;
+
+  switch (type) {
+    case 'daily':
+      startingDate = new Date(currentDate);
+      startingDate.setHours(0, 0, 0, 0);
+      endingDate = new Date(currentDate);
+      endingDate.setHours(23, 59, 59, 999);
+      break;
+
+    case 'weekly':
+      startingDate = new Date(currentDate);
+      startingDate.setDate(currentDate.getDate() - currentDate.getDay()); // Start of the week (Sunday)
+      startingDate.setHours(0, 0, 0, 0);
+      endingDate = new Date(currentDate);
+      endingDate.setDate(startingDate.getDate() + 6); // End of the week (Saturday)
+      endingDate.setHours(23, 59, 59, 999);
+      break;
+
+    case 'monthly':
+      startingDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // First day of the month
+      startingDate.setHours(0, 0, 0, 0);
+      endingDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Last day of the month
+      endingDate.setHours(23, 59, 59, 999);
+      break;
+
+    default:
+      throw new Error('Invalid report type');
+  }
+
+  return { startingDate, endingDate };
+};
+
+const createPDF = async (data, res) => {
+  const { orders, totalSalesAmount, totalOrders, startingDate, endingDate } = data;
+
+  // Create a new PDF document
+  const doc = new PDFDocument();
+  const filePath = `./sales-report-${Date.now()}.pdf`;
+
+  // Pipe PDF content to a file
+  const writeStream = fs.createWriteStream(filePath);
+  doc.pipe(writeStream);
+
+  // Header
+  doc.fontSize(20).text('Sales Report', { align: 'center' });
+  doc.moveDown();
+  
+  // Summary Information
+  doc
+    .fontSize(12)
+    .text(`Date Range: ${startingDate.toISOString().split('T')[0]} - ${endingDate.toISOString().split('T')[0]}`)
+    .text(`Total Sales Amount: ₹ ${totalSalesAmount.toFixed(2)}`)
+    .text(`Total Orders: ${totalOrders}`);
+  doc.moveDown();
+
+  // Table Header
+  const tableTop = doc.y;
+  const cellWidth = 100;
+  const minRowHeight = 20;
+
+  doc.fontSize(10).text('Order ID', 50, tableTop, { width: cellWidth, align: 'left' });
+  doc.text('Order Date', 150, tableTop, { width: cellWidth, align: 'left' });
+  doc.text('Product', 250, tableTop, { width: cellWidth, align: 'left' });
+  doc.text('Quantity', 350, tableTop, { width: cellWidth, align: 'left' });
+  doc.text('Total Amount', 450, tableTop, { width: cellWidth, align: 'left' });
+
+  // Table Header Border
+  doc.rect(50, tableTop - 5, 500, minRowHeight).stroke();
+
+  // Table Body
+  let yPosition = tableTop + minRowHeight;
+
+  orders.forEach((order) => {
+    const productNames = order.orderItems.map((item) => item.name).join(', ');
+    const productQuantities = order.orderItems.map((item) => item.quantity).join(', ');
+
+    // Calculate dynamic row height
+    const textHeight = Math.max(
+      doc.heightOfString(productNames, { width: cellWidth }),
+      doc.heightOfString(productQuantities, { width: cellWidth })
+    );
+    const rowHeight = Math.max(minRowHeight, textHeight + 10);
+
+    // Draw a border for each row
+    doc.rect(50, yPosition - 5, 500, rowHeight).stroke();
+
+    // Add the table data
+    doc.text(order.orderID, 50, yPosition, { width: cellWidth, align: 'left' });
+    doc.text(new Date(order.orderDate).toLocaleDateString(), 150, yPosition, {
+      width: cellWidth,
+      align: 'left',
+    });
+    doc.text(productNames, 250, yPosition, { width: cellWidth, align: 'left' });
+    doc.text(productQuantities, 350, yPosition, { width: cellWidth, align: 'left' });
+    doc.text(order.totalAmount.toFixed(2), 450, yPosition, { width: cellWidth, align: 'left' });
+
+    yPosition += rowHeight;
+
+    // Add a new page if the table exceeds the page height
+    if (yPosition > 750) {
+      doc.addPage();
+      yPosition = 50;
+    }
+  });
+
+  // Finalize PDF
+  doc.end();
+
+  // Send PDF to client
+  writeStream.on('finish', () => {
+    res.download(filePath, 'sales-report.pdf', (err) => {
+      if (err) {
+        console.error(err);
+      }
+
+      // Clean up the file after download
+      fs.unlinkSync(filePath);
+    });
+  });
+};
+
+
+const generateSalesReport = async (type, req, res, next) => {
+  try {
+    const { startingDate, endingDate } = getDateRange(type);
+
+    const query = {
+      status: 'Delivered',
+      orderDate: {
+        $gte: new Date(startingDate),
+        $lte: new Date(endingDate),
+      },
+    };
+
+    const orders = await Order.find(query).sort({ orderDate: -1 });
+    let totalSalesAmount = 0;
+    let totalOrders = orders.length;
+
+    for (const order of orders) {
+      totalSalesAmount += order.totalAmount;
+    }
+
+    const data = {
+      orders,
+      totalSalesAmount,
+      totalOrders,
+      startingDate,
+      endingDate,
+    };
+
+    // Generate and send PDF (reuse existing logic)
+    await createPDF(data, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+const salesReportDaily = async (req, res, next) => {
+  try {
+    await generateSalesReport('daily', req, res, next);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const salesReportWeekly = async (req, res, next) => {
+  try {
+    await generateSalesReport('weekly', req, res, next);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const salesReportMonthly = async (req, res, next) => {
+  try {
+    await generateSalesReport('monthly', req, res, next);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
 
 
 
@@ -572,6 +760,9 @@ module.exports = {
   loadReportForm,
   generateReport ,
   salesReportPdf,
+  salesReportDaily,
+  salesReportWeekly,
+  salesReportMonthly,
   salesReportExcel
   
 

@@ -197,7 +197,26 @@
             <!-- /Search -->
             
             <ul class="navbar-nav flex-row align-items-center ms-auto">
-              <a href="/admin/sales-report" class="btn btn-primary">Generate Report</a>
+              <!-- <a href="/admin/sales-report" class="btn btn-primary">Generate Report</a> -->
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  Generate Report
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li>
+                    <a class="dropdown-item" href="/admin/sales-report-pdf/daily">Daily</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/admin/sales-report-pdf/weekly">Weekly</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/admin/sales-report-pdf/monthly">Monthly</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/admin/sales-report">Date range</a>
+                  </li>
+                </ul>
+              </div>
 
               <!-- Place this tag where you want the button to render. -->
               
