@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer')
 
 const excel = require('exceljs');
 const ejs = require('ejs')
-const puppeteer = require('puppeteer');
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 // const { default: orders } = require('razorpay/dist/types/orders');
@@ -361,10 +361,11 @@ const generateReport = async (req, res, next) => {
       next(error);
   }
 };
+
 const salesReportPdf = async (req, res, next) => {
   try {
-    let startingDate = req.query.startingDate;
-    let endingDate = req.query.endingDate;
+    const startingDate = req.query.startingDate;
+    const endingDate = req.query.endingDate;
 
     const query = {
       status: 'Delivered',
@@ -390,22 +391,92 @@ const salesReportPdf = async (req, res, next) => {
       endingDate,
     };
 
-    const filePathName = path.join(__dirname, '..', 'views', 'admin', 'reportPdf.ejs');
-    const htmlString = fs.readFileSync(filePathName).toString();
-    const ejsData = ejs.render(htmlString, data);
+    // Create a new PDF document
+    const doc = new PDFDocument({ margin: 30 });
+    const filePath = `./sales-report-${Date.now()}.pdf`;
 
-    const browser = await puppeteer.launch({
-      
-      args: ['--no-sandbox', '--disable-setuid-sandbox'], 
-  });
-    const page = await browser.newPage();
-    await page.setContent(ejsData);
-    const pdfBuffer = await page.pdf({ format: 'Letter' });
-    await browser.close();
+    // Pipe PDF content to a file
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
 
-    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
-    res.setHeader('Content-Type', 'application/pdf');
-    res.status(200).end(pdfBuffer, 'binary');
+    // Report Header
+    doc.fontSize(18).text('Sales Report', { align: 'center' }).moveDown();
+
+    doc
+      .fontSize(12)
+      .text(`Start Date: ${startingDate}`)
+      .text(`End Date: ${endingDate}`)
+      .text(`Total Orders: ${totalOrders}`)
+      .text(`Total Sales Amount: ₹${totalSalesAmount.toFixed(2)}`)
+      .moveDown();
+
+    // Table Header
+    doc.fontSize(14).text('Order Details:', { underline: true }).moveDown();
+    const tableTop = doc.y;
+    const colWidths = [100, 100, 200, 80, 80];
+    const headers = ['Order ID', 'Order Date', 'Products', 'Quantity', 'Total Amount'];
+
+    headers.forEach((header, index) => {
+      doc
+        .fontSize(12)
+        .text(header, 50 + colWidths.slice(0, index).reduce((a, b) => a + b, 0), tableTop, {
+          width: colWidths[index],
+          align: 'center',
+        });
+    });
+
+    // Draw Line Under Header
+    doc
+      .moveTo(50, tableTop + 20)
+      .lineTo(50 + colWidths.reduce((a, b) => a + b, 0), tableTop + 20)
+      .stroke();
+
+    // Table Rows
+    let y = tableTop + 25;
+    orders.forEach((order) => {
+      const productNames = order.orderItems.map((item) => item.name).join(', ');
+      const quantities = order.orderItems.map((item) => item.quantity).join(', ');
+
+      const row = [
+        order._id,
+        new Date(order.orderDate).toLocaleDateString(),
+        productNames,
+        quantities,
+        `₹${order.totalAmount.toFixed(2)}`,
+      ];
+
+      row.forEach((cell, index) => {
+        doc
+          .fontSize(10)
+          .text(cell, 50 + colWidths.slice(0, index).reduce((a, b) => a + b, 0), y, {
+            width: colWidths[index],
+            align: 'center',
+          });
+      });
+
+      y += 20;
+
+      // Add a new page if the current one is full
+      if (y > doc.page.height - 50) {
+        doc.addPage();
+        y = 50;
+      }
+    });
+
+    // Finalize PDF
+    doc.end();
+
+    // When writing is complete, send the file
+    writeStream.on('finish', () => {
+      res.download(filePath, 'sales-report.pdf', (err) => {
+        if (err) {
+          console.error(err);
+        }
+
+        // Clean up the file after download
+        fs.unlinkSync(filePath);
+      });
+    });
   } catch (error) {
     next(error);
   }
